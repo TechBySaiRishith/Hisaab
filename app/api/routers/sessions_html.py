@@ -339,7 +339,11 @@ async def show_shuttles_step(
     pids = {sp.player_id for c in s.courts for sl in c.slots for sp in sl.players}
     rows = await PlayerRepository(session).list_active(include_self=True)
     session_players = [p for p in rows if p.id in pids]
-    existing = {sc.owner_player_id: sc.total_minutes for sc in s.shuttle_contributions}
+    # Existing contributions keyed by (court_id, owner_player_id) → minutes,
+    # so the form can pre-fill the right cells when the user goes back.
+    existing: dict[tuple[int, int], int] = {
+        (sc.court_id, sc.owner_player_id): sc.total_minutes for sc in s.shuttle_contributions
+    }
     templates = request.app.state.templates
     return templates.TemplateResponse(
         request,
@@ -358,6 +362,8 @@ async def submit_shuttles(
     request: Request,
     session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
+    """Form fields are named `court_<court_id>_player_<player_id>_minutes`.
+    Cells with 0 minutes are dropped (they aren't contributions)."""
     from typing import cast
 
     from app.persistence.repositories.session import ShuttleInputDict
@@ -365,13 +371,31 @@ async def submit_shuttles(
     form = await request.form()
     contribs = []
     for key, value in form.items():
-        if not (key.startswith("player_") and key.endswith("_minutes")):
+        if not (key.startswith("court_") and "_player_" in key and key.endswith("_minutes")):
             continue
-        pid = int(key.removeprefix("player_").removesuffix("_minutes"))
-        minutes = int(value or 0)
+        # parse: court_<cid>_player_<pid>_minutes
+        body = key.removeprefix("court_").removesuffix("_minutes")
+        try:
+            cid_str, _player, pid_str = body.split("_", 2)
+            assert _player == "player"
+            court_id = int(cid_str)
+            player_id = int(pid_str)
+        except (ValueError, AssertionError):
+            continue
+        try:
+            minutes = int(value or 0)
+        except ValueError:
+            continue
         if minutes > 0:
             contribs.append(
-                cast("ShuttleInputDict", {"owner_player_id": pid, "total_minutes": minutes})
+                cast(
+                    "ShuttleInputDict",
+                    {
+                        "court_id": court_id,
+                        "owner_player_id": player_id,
+                        "total_minutes": minutes,
+                    },
+                )
             )
     await SessionRepository(session).update_shuttle_contributions(
         session_id, contributions=contribs

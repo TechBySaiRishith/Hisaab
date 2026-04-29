@@ -41,7 +41,11 @@ async def session_orm_to_domain(session: AsyncSession, s: ORMSession) -> Session
     )
 
     contribs = tuple(
-        ShuttleContributionInput(owner_player_id=sc.owner_player_id, total_minutes=sc.total_minutes)
+        ShuttleContributionInput(
+            court_id=sc.court_id,
+            owner_player_id=sc.owner_player_id,
+            total_minutes=sc.total_minutes,
+        )
         for sc in s.shuttle_contributions
     )
 

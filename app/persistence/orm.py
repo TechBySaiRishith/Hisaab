@@ -189,11 +189,18 @@ class SlotPlayer(Base):
 
 class ShuttleContribution(Base):
     __tablename__ = "shuttle_contributions"
-    __table_args__ = (UniqueConstraint("session_id", "owner_player_id", name="uq_session_owner"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "session_id", "court_id", "owner_player_id", name="uq_session_court_owner"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     session_id: Mapped[int] = mapped_column(
         ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False
+    )
+    court_id: Mapped[int] = mapped_column(
+        ForeignKey("courts.id", ondelete="CASCADE"), nullable=False
     )
     owner_player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     total_minutes: Mapped[int] = mapped_column(Integer, nullable=False)

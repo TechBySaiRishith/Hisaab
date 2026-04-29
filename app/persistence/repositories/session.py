@@ -28,6 +28,7 @@ class CourtInputDict(TypedDict):
 
 
 class ShuttleInputDict(TypedDict):
+    court_id: int
     owner_player_id: int
     total_minutes: int
 
@@ -78,6 +79,7 @@ class SessionRepository:
             self._s.add(
                 ShuttleContribution(
                     session_id=s.id,
+                    court_id=shuttle["court_id"],
                     owner_player_id=shuttle["owner_player_id"],
                     total_minutes=shuttle["total_minutes"],
                 )
@@ -184,6 +186,7 @@ class SessionRepository:
                 self._s.add(
                     ShuttleContribution(
                         session_id=s.id,
+                        court_id=c["court_id"],
                         owner_player_id=c["owner_player_id"],
                         total_minutes=c["total_minutes"],
                     )

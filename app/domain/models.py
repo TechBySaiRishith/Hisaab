@@ -48,6 +48,7 @@ class CourtInput:
 
 @dataclass(frozen=True, slots=True)
 class ShuttleContributionInput:
+    court_id: int
     owner_player_id: int
     total_minutes: int
 
