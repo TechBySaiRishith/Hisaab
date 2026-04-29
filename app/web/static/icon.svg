@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Hisaab">
+  <!-- Background: rounded square in deep navy charcoal (matches the app's dark surface) -->
+  <rect width="512" height="512" rx="96" fill="#161a28"/>
+
+  <!-- Subtle court-line diagonal hairlines (the same texture pattern as the app's body bg) -->
+  <g opacity="0.06" stroke="#ffffff" stroke-width="1.5">
+    <line x1="-100" y1="-90" x2="612" y2="350"/>
+    <line x1="-100" y1="-30" x2="612" y2="410"/>
+    <line x1="-100" y1="30"  x2="612" y2="470"/>
+    <line x1="-100" y1="90"  x2="612" y2="530"/>
+    <line x1="-100" y1="150" x2="612" y2="590"/>
+    <line x1="-100" y1="210" x2="612" y2="650"/>
+  </g>
+
+  <!-- Monogram H: bold geometric, slightly condensed to echo Bricolage Grotesque -->
+  <path d="
+    M 92 108
+    L 184 108
+    L 184 232
+    L 328 232
+    L 328 108
+    L 420 108
+    L 420 412
+    L 328 412
+    L 328 308
+    L 184 308
+    L 184 412
+    L 92 412
+    Z
+  " fill="#f4f0e7"/>
+
+  <!-- Shuttle-yellow period — the signature "settle up" accent -->
+  <circle cx="450" cy="410" r="32" fill="#e6c93e"/>
+</svg>

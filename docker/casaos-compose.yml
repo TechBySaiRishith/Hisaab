@@ -51,6 +51,7 @@ x-casaos:
   port_map: "8090"
   scheme: http
   index: /
+  icon: https://raw.githubusercontent.com/TechBySaiRishith/Hisaab/main/app/web/static/icon.svg
   category: Personal
   developer: TechBySaiRishith
   author: TechBySaiRishith
