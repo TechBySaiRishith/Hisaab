@@ -18,8 +18,11 @@ services:
     container_name: hisaab-app
     restart: unless-stopped
     ports:
+      # Host port 8090 → container port 8080. Bump 8090 to whatever's free
+      # if you also have something using 8090. The container itself always
+      # listens on 8080 internally — leave `target` alone.
       - target: 8080
-        published: "8080"
+        published: "8090"
         protocol: tcp
     volumes:
       - type: bind
@@ -45,7 +48,7 @@ x-casaos:
     - arm64
     - amd64
   main: app
-  port_map: "8080"
+  port_map: "8090"
   scheme: http
   index: /
   category: Personal
