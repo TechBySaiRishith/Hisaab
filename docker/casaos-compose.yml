@@ -1,0 +1,70 @@
+# CasaOS-friendly compose for Hisaab.
+#
+# Usage:
+#   1. Make the GHCR package public (one-time, in GitHub):
+#      github.com/users/TechBySaiRishith/packages/container/hisaab/settings
+#      → Change visibility → Public
+#   2. In CasaOS web UI: Apps → "+" → Custom Install → YAML / Compose tab
+#   3. Paste the contents of this file → Install
+#
+# Data lives on the host at /DATA/AppData/hisaab/data/ (the standard CasaOS
+# AppData location). The SQLite DB (hisaab.db) survives container rebuilds.
+
+name: hisaab
+
+services:
+  app:
+    image: ghcr.io/techbysairishith/hisaab:latest
+    container_name: hisaab-app
+    restart: unless-stopped
+    ports:
+      - target: 8080
+        published: "8080"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /DATA/AppData/hisaab/data
+        target: /app/data
+    environment:
+      DATABASE_URL: "sqlite+aiosqlite:////app/data/hisaab.db"
+      LOG_LEVEL: info
+      TZ: Asia/Kolkata
+      UPI_ID: ""
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://localhost:8080/health')
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+x-casaos:
+  architectures:
+    - arm64
+    - amd64
+  main: app
+  port_map: "8080"
+  scheme: http
+  index: /
+  category: Personal
+  developer: TechBySaiRishith
+  author: TechBySaiRishith
+  title:
+    en_us: Hisaab
+  tagline:
+    en_us: Slot-fair badminton cost splitter
+  description:
+    en_us: |
+      Hisaab — settle up after badminton. Slot-based fair cost splits across
+      multiple courts, pro-rata shuttle distribution, ₹5 rounding, and
+      pre-filled WhatsApp payment links per friend. Self-hosted, mobile-first.
+  tips:
+    before_install:
+      en_us: |
+        First-time setup inside the app:
+          1. Settings → set "Your name" at the top
+          2. Settings → Venues → add a venue with hourly rates
+          3. Roster → add your regular players
+          4. Tap "+ NEW MATCH" on the home screen to log a session
