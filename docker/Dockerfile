@@ -1,15 +1,22 @@
 # syntax=docker/dockerfile:1.7
 # ---------------- Stage 1: Tailwind build ------------------
-# Uses Alpine (linux/amd64 on typical CI). Tailwind binary is pinned to x64.
-# CSS output is architecture-independent — same bytes regardless of which binary built it.
-FROM alpine:3.19 AS tailwind
+# Pinned to BUILDPLATFORM (amd64 on GitHub runners) so we run the matching
+# Tailwind binary natively without QEMU. CSS output is architecture-independent
+# text, so stage 2 can still target linux/arm64 for the Pi.
+FROM --platform=$BUILDPLATFORM alpine:3.19 AS tailwind
 WORKDIR /build
 
 ARG TAILWIND_VERSION=4.0.0
+ARG TARGETARCH
 RUN apk add --no-cache curl && \
-    curl -sLO "https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}/tailwindcss-linux-x64" && \
-    chmod +x tailwindcss-linux-x64 && \
-    mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
+    case "$(uname -m)" in \
+        x86_64)  TW_ARCH=x64   ;; \
+        aarch64) TW_ARCH=arm64 ;; \
+        *) echo "unsupported arch: $(uname -m)" && exit 1 ;; \
+    esac && \
+    curl -sLO "https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}/tailwindcss-linux-${TW_ARCH}" && \
+    chmod +x "tailwindcss-linux-${TW_ARCH}" && \
+    mv "tailwindcss-linux-${TW_ARCH}" /usr/local/bin/tailwindcss
 
 COPY tailwind.config.js ./
 COPY app/web/static/css/tailwind.input.css ./input.css
