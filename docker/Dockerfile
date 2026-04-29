@@ -42,8 +42,8 @@ RUN groupadd --gid 1000 app && \
     useradd --uid 1000 --gid app --no-create-home app
 
 COPY pyproject.toml ./
-# Install only runtime deps (no [dev] extras)
-RUN pip install --no-cache-dir -e ".[]"
+# Install only runtime deps (no [dev] extras — they're for local lint/type only)
+RUN pip install --no-cache-dir -e .
 
 COPY app ./app
 COPY alembic.ini ./
