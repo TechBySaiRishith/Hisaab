@@ -3,12 +3,19 @@
 # Pinned to BUILDPLATFORM (amd64 on GitHub runners) so we run the matching
 # Tailwind binary natively without QEMU. CSS output is architecture-independent
 # text, so stage 2 can still target linux/arm64 for the Pi.
-FROM --platform=$BUILDPLATFORM alpine:3.19 AS tailwind
+#
+# We use debian-slim (glibc) rather than alpine (musl) because Tailwind's
+# default linux-x64 / linux-arm64 binaries are glibc-linked. (The musl
+# variants exist as -musl suffixes but glibc is the path of least surprise.)
+# This stage is discarded after the CSS file is copied, so base image size
+# does not affect the final image.
+FROM --platform=$BUILDPLATFORM debian:bookworm-slim AS tailwind
 WORKDIR /build
 
 ARG TAILWIND_VERSION=4.0.0
-ARG TARGETARCH
-RUN apk add --no-cache curl && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
     case "$(uname -m)" in \
         x86_64)  TW_ARCH=x64   ;; \
         aarch64) TW_ARCH=arm64 ;; \
