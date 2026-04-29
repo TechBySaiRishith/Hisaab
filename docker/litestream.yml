@@ -1,0 +1,7 @@
+dbs:
+  - path: /app/data/hisaab.db
+    replicas:
+      - type: file
+        path: /backup/hisaab
+        retention: 168h         # 7 days
+        snapshot-interval: 24h

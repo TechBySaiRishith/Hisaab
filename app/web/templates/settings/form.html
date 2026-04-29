@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Hisaab — Settings{% endblock %}
+{% block content %}
+
+<header class="mb-10 rise rise-1">
+  <div class="eyebrow mb-3">Settings</div>
+  <h1 class="display display-xl">House<br /><span style="color: var(--color-accent);">rules.</span></h1>
+</header>
+
+<div class="mb-8 rise rise-2">
+  <a href="/venues" class="card flex items-center justify-between"
+     style="padding: 1rem 1.25rem; text-decoration: none; color: inherit;">
+    <div>
+      <div class="eyebrow mb-1">Venues</div>
+      <div class="font-medium">Manage rates &amp; courts</div>
+    </div>
+    <span class="numeral text-xl" style="color: var(--color-muted);">→</span>
+  </a>
+</div>
+
+<form method="post" action="/settings" class="rise rise-3">
+  <div class="field">
+    <label class="field-label" for="your_name">
+      Your name
+      <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">
+        (shown only on the result page — friends never see this)
+      </span>
+    </label>
+    <div class="grid grid-cols-[80px_1fr] gap-2">
+      <input id="your_emoji" name="your_emoji" maxlength="8" value="{{ self_player.emoji if self_player else '🫵' }}" class="field-input text-center" style="font-size: 1.25rem;" />
+      <input id="your_name" name="your_name" value="{{ self_player.name if self_player else 'You' }}" required class="field-input" autocomplete="off" />
+    </div>
+    <div class="text-xs mt-2" style="color: var(--color-muted);">
+      You're auto-included in every session — no need to add yourself to the roster.
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="upi_id">UPI ID <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">(used in WhatsApp messages)</span></label>
+    <input id="upi_id" name="upi_id" value="{{ settings.upi_id or '' }}" placeholder="yourname@bank" class="field-input numeral" />
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="message_template">Message template</label>
+    <textarea id="message_template" name="message_template" rows="11" class="field-textarea" style="font-family: var(--font-family-mono); font-size: 0.85rem; line-height: 1.55;">{{ settings.message_template }}</textarea>
+    <div class="mt-2 text-xs" style="color: var(--color-muted);">
+      Available tokens: <span class="numeral">{name}</span>, <span class="numeral">{played_on}</span>, <span class="numeral">{venue}</span>, <span class="numeral">{owes_court}</span>, <span class="numeral">{owes_shuttle}</span>, <span class="numeral">{abs_net}</span>, <span class="numeral">{direction}</span>, <span class="numeral">{credit_lines}</span>, <span class="numeral">{upi_line}</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="theme">Theme</label>
+    <select id="theme" name="theme" class="field-select">
+      <option value="system" {% if settings.theme == "system" %}selected{% endif %}>System</option>
+      <option value="dark"   {% if settings.theme == "dark" %}selected{% endif %}>Dark (default)</option>
+    </select>
+  </div>
+
+  <button class="btn btn-primary w-full mt-8">Save settings</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Hisaab — Roster{% endblock %}
+{% block content %}
+
+<header class="mb-10 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <span class="eyebrow">Roster</span>
+    <span class="eyebrow numeral" style="color: var(--color-muted);">{{ players|length if players else "00" }} · On the books</span>
+  </div>
+  <h1 class="display display-xl">The<br /><span style="color: var(--color-accent);">squad.</span></h1>
+</header>
+
+<div class="flex justify-end mb-5 rise rise-2">
+  <a href="/players/new" class="btn btn-primary">
+    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="7" y1="2" x2="7" y2="12" />
+      <line x1="2" y1="7" x2="12" y2="7" />
+    </svg>
+    Add player
+  </a>
+</div>
+
+{% if players %}
+<ul class="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3">
+  {% for p in players %}
+    <li class="card flex items-center justify-between gap-3 rise rise-{{ loop.index + 1 if loop.index + 1 < 9 else 8 }}"
+        style="padding: 1rem 1.125rem;">
+      <a href="/players/{{ p.id }}/edit" class="flex items-center gap-3 min-w-0 flex-1"
+         style="text-decoration: none; color: inherit;">
+        <span class="flex items-center justify-center rounded-full"
+              style="width: 40px; height: 40px; font-size: 1.25rem; background: var(--color-surface-2); box-shadow: 0 0 0 1px var(--color-line) inset;">
+          {{ p.emoji }}
+        </span>
+        <div class="min-w-0">
+          <div class="font-medium truncate flex items-center gap-2">
+            {{ p.name }}
+            {% if p.message_template %}
+              <span class="chip-mini" title="Has a custom WhatsApp message">✎ custom</span>
+            {% endif %}
+          </div>
+          {% if p.phones %}
+            <div class="numeral text-xs truncate" style="color: var(--color-ink-2);">
+              {{ p.phones[0].e164_number }}
+            </div>
+          {% else %}
+            <div class="text-xs" style="color: var(--color-muted);">no phone</div>
+          {% endif %}
+        </div>
+      </a>
+      <form method="post" action="/players/{{ p.id }}/delete" onsubmit="return confirm('Remove {{ p.name }} from roster? Old sessions still show their name.');">
+        <button class="btn btn-ghost btn-danger" style="min-height: 36px; padding: 0.4rem 0.75rem; font-size: 0.65rem;">
+          Remove
+        </button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="card text-center rise rise-2" style="padding: 2.5rem 1.25rem;">
+  <div style="font-size: 2.5rem;">🏸</div>
+  <div class="mt-4 display text-xl">Roster is empty.</div>
+  <div class="mt-2 text-sm" style="color: var(--color-ink-2);">
+    Add your regular players above.
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

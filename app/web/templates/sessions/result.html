@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}{{ session.played_on.strftime('%d %b') }} · Cost split{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="eyebrow mb-3">{{ session.played_on.strftime('%a · %d %b %Y') }}</div>
+  <h1 class="display text-4xl mb-1">{{ venue.name }}</h1>
+  <div class="flex items-center gap-3 mt-3" style="color: var(--color-ink-2);">
+    <span class="eyebrow">Cost split</span>
+    <span class="status" data-state="{{ session.status }}">{{ session.status }}</span>
+  </div>
+</header>
+
+<div class="ticket mb-6 rise rise-2">
+  <div class="grid grid-cols-2 gap-6">
+    <div>
+      <div class="eyebrow mb-2">Court Total</div>
+      <div class="numeral text-2xl">
+        <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ result.total_court_cost | int }}
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow mb-2">Shuttle Total</div>
+      <div class="numeral text-2xl">
+        <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ result.total_shuttle_cost | int }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if you %}
+  <div class="ticket mb-8 rise rise-3"
+       style="background: linear-gradient(135deg, var(--color-accent-soft), transparent 60%), var(--color-surface);
+              box-shadow: 0 0 0 1px var(--color-accent) inset;">
+    <div class="flex items-baseline justify-between gap-3 mb-3">
+      <div class="flex items-baseline gap-2">
+        <span class="eyebrow" style="color: var(--color-accent);">Your tally</span>
+      </div>
+      <span class="eyebrow numeral" style="color: var(--color-muted);">{{ you.play_minutes }} min played</span>
+    </div>
+
+    <div class="flex items-end justify-between mb-3">
+      {% if you.net == 0 %}
+        <div class="display text-4xl">Settled</div>
+      {% elif you.net < 0 %}
+        <div>
+          <div class="numeral text-5xl" style="color: var(--color-accent); font-weight: 700; line-height: 1;">
+            <span style="color: var(--color-muted); font-weight: 400; font-size: 0.65em; vertical-align: 0.15em;">₹</span>{{ you.abs_net }}
+          </div>
+          <div class="eyebrow mt-2" style="color: var(--color-accent);">to collect tonight</div>
+        </div>
+      {% else %}
+        <div>
+          <div class="numeral text-5xl" style="color: var(--color-negative); font-weight: 700; line-height: 1;">
+            <span style="color: var(--color-muted); font-weight: 400; font-size: 0.65em; vertical-align: 0.15em;">₹</span>{{ you.abs_net }}
+          </div>
+          <div class="eyebrow mt-2" style="color: var(--color-negative);">you owe tonight</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="perf my-3"></div>
+
+    <div class="grid grid-cols-2 gap-3 text-xs">
+      <div>
+        <div class="eyebrow mb-1">Your share</div>
+        <div class="numeral" style="color: var(--color-ink-2);">
+          court ₹{{ you.owes_court }} · shuttle ₹{{ you.owes_shuttle }}
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow mb-1">Credit</div>
+        <div class="numeral" style="color: var(--color-ink-2);">
+          {% if you.credit_total > 0 %}
+            ₹{{ you.credit_total }}
+            <span class="ml-1" style="color: var(--color-muted);">
+              ({% if you.credit_court > 0 %}court ₹{{ you.credit_court }}{% endif %}{% if you.credit_court > 0 and you.credit_shuttle > 0 %} · {% endif %}{% if you.credit_shuttle > 0 %}shuttle ₹{{ you.credit_shuttle }}{% endif %})
+            </span>
+          {% else %}—{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if other_results %}
+  <div class="flex items-center justify-between mb-3 rise rise-4">
+    <span class="eyebrow">Send messages</span>
+    <span class="eyebrow numeral" style="color: var(--color-muted);">{{ other_results|length }} · Friends</span>
+  </div>
+
+  <ul class="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-4">
+    {% for p in other_results %}
+      {% set line = lines[p.player_id] %}
+    {% set net_state = "positive" if p.net > 0 else ("negative" if p.net < 0 else "neutral") %}
+    <li class="ticket rise rise-{{ loop.index + 3 if loop.index + 3 < 9 else 8 }}">
+      <div class="flex items-baseline justify-between gap-3 mb-3">
+        <div class="min-w-0 flex items-baseline gap-2">
+          <span class="eyebrow numeral" style="color: var(--color-muted);">#{{ "%02d"|format(loop.index) }}</span>
+          <span class="display text-2xl truncate" style="font-stretch: 95%;">{{ p.name }}</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 justify-end shrink-0">
+          {% if line.uses_custom_template %}
+            <span class="chip-mini" title="Using this player's custom WhatsApp message">✎ custom</span>
+          {% endif %}
+          {% if not line.has_phone %}
+            <span class="chip-mini" style="background: color-mix(in oklch, var(--color-muted) 22%, transparent); color: var(--color-ink-2);">no phone</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="rounded p-3" style="background: var(--color-bg);">
+          <div class="eyebrow mb-1">Court</div>
+          <div class="numeral text-lg">
+            <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ p.owes_court }}
+          </div>
+        </div>
+        <div class="rounded p-3" style="background: var(--color-bg);">
+          <div class="eyebrow mb-1">Shuttle</div>
+          <div class="numeral text-lg">
+            <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ p.owes_shuttle }}
+          </div>
+        </div>
+      </div>
+
+      {% if p.credit_total > 0 %}
+        <div class="text-xs mb-3 numeral" style="color: var(--color-positive);">
+          ⤴ credited ₹{{ p.credit_total }}{% if p.credit_court > 0 %} (court ₹{{ p.credit_court }}{% if p.credit_shuttle > 0 %} · shuttle ₹{{ p.credit_shuttle }}{% endif %}){% endif %}
+        </div>
+      {% endif %}
+
+      <div class="perf mb-3"></div>
+
+      <div class="flex items-baseline justify-between mb-4">
+        <span class="eyebrow">Net</span>
+        {% if p.net == 0 %}
+          <span class="display text-2xl" style="color: var(--color-ink-2);">Settled</span>
+        {% elif p.net > 0 %}
+          <div class="text-right">
+            <div class="numeral text-3xl" style="color: var(--color-accent); font-weight: 600;">
+              <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ p.net }}
+            </div>
+            <div class="eyebrow mt-1">Owes you</div>
+          </div>
+        {% else %}
+          <div class="text-right">
+            <div class="numeral text-3xl" style="color: var(--color-negative); font-weight: 600;">
+              <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ -p.net }}
+            </div>
+            <div class="eyebrow mt-1">You owe</div>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if p.net != 0 %}
+        {% if line.has_phone %}
+          <a href="{{ line.wa_me_url }}" target="_blank" rel="noopener" class="btn btn-primary w-full">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.4-.1-.6.1l-.9 1c-.2.2-.3.2-.6.1-.9-.4-1.7-.9-2.4-1.7-.6-.6-1.1-1.4-1.5-2.1-.2-.3-.1-.4.1-.6l.7-.7c.1-.1.2-.3.1-.5l-.9-2.1c-.1-.3-.3-.3-.6-.3h-.5c-.2 0-.4.1-.6.3-.6.6-1 1.4-1 2.3.1 1.1.5 2.1 1.1 3 1.2 1.7 2.7 3.1 4.5 4 .5.2.9.4 1.4.5.5.2 1 .2 1.6.1.7-.1 1.3-.6 1.7-1.2.2-.4.2-.8.1-1.2l-.2-.1m2.5-9.4c-4.4-4.4-11.5-4.4-15.9 0-3.6 3.6-4.3 9.2-1.7 13.6L1 23l4.5-1.4c1.6.9 3.4 1.3 5.2 1.3 6.2 0 11.2-5 11.2-11.2 0-3-1.2-5.8-3.4-7.9m-2.4 13.5c-1.4 1.4-3.2 2.2-5.2 2.2-1.6 0-3.2-.4-4.5-1.3l-.3-.2-2.7.8.8-2.6-.2-.3c-2.4-3.7-1.3-8.6 2.4-11 3.7-2.4 8.6-1.3 11 2.4 2.4 3.6 1.3 8.5-2.3 10.9.1 0 0 0 0 .1z"/>
+            </svg>
+            Send via WhatsApp
+          </a>
+        {% else %}
+          <button class="btn btn-ghost w-full"
+                  data-copy="{{ line.message_text|e }}"
+                  onclick="navigator.clipboard.writeText(this.dataset.copy); this.querySelector('.btn-label').textContent='Copied ✓'; setTimeout(()=>{this.querySelector('.btn-label').textContent='Copy message'}, 1800);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            <span class="btn-label">Copy message</span>
+          </button>
+        {% endif %}
+      {% endif %}
+    </li>
+  {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" action="/sessions/{{ session.id }}/mark-sent" class="mt-6">
+  <button class="btn btn-ghost w-full">Mark all sent</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}New session — Slot grid{% endblock %}
+{% block content %}
+
+<header class="mb-6 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-muted);">04</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-accent);">05</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-muted);">07</span>
+      <span class="ml-2">Slot grid</span>
+    </div>
+    <a href="/sessions/{{ session.id }}/courts" class="eyebrow flex items-center gap-1"
+       style="color: var(--color-muted); text-decoration: none;">
+      <span>←</span><span>Back</span>
+    </a>
+  </div>
+  <h1 class="display text-4xl">Who<br />played?</h1>
+  <p class="mt-3 text-sm" style="color: var(--color-ink-2);">Tap a cell to assign players for that 30-min slot.</p>
+</header>
+
+<div class="card overflow-x-auto rise rise-2" style="padding: 1rem;">
+  <div class="grid gap-2 min-w-max"
+       style="grid-template-columns: max-content repeat({{ n_slots }}, minmax(76px, 1fr));">
+    <div></div>
+    {% for i in range(n_slots) %}
+      <div class="text-center">
+        <div class="eyebrow numeral">{{ "%02d"|format(i + 1) }}</div>
+        <div class="text-[0.6rem] mt-0.5 numeral" style="color: var(--color-muted);">
+          {{ i*30 }}–{{ (i+1)*30 }}m
+        </div>
+      </div>
+    {% endfor %}
+
+    {% for court in courts %}
+      <div class="self-center pr-2">
+        <div class="eyebrow whitespace-nowrap">{{ court.label }}</div>
+      </div>
+      {% for slot in court.slots %}
+        {% include "partials/slot_cell.html" %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+<div id="slot-picker" class="fixed inset-x-0 bottom-20 z-30 px-4"></div>
+
+<a href="/sessions/{{ session.id }}/shuttles" class="btn btn-primary w-full mt-6 rise rise-3">
+  Continue · Shuttles
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <path d="M3 7h8M8 4l3 3-3 3" />
+  </svg>
+</a>
+
+{% endblock %}

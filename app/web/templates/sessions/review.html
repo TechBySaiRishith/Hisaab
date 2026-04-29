@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}New session — Review{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-muted);">06</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-accent);">07</span>
+      <span class="ml-2">Review</span>
+    </div>
+    <a href="/sessions/{{ session.id }}/shuttles" class="eyebrow flex items-center gap-1"
+       style="color: var(--color-muted); text-decoration: none;">
+      <span>←</span><span>Back</span>
+    </a>
+  </div>
+  <h1 class="display text-4xl">Lock<br />it in.</h1>
+  <p class="mt-3 text-sm" style="color: var(--color-ink-2);">
+    Preview against current rates. Finalize snapshots them so historical totals stay reproducible.
+  </p>
+</header>
+
+<div class="ticket mb-6 rise rise-2">
+  <div class="eyebrow mb-2">{{ session.played_on.strftime('%a · %d %b %Y') }}</div>
+  <div class="display text-2xl mb-3">{{ venue.name }}</div>
+  <div class="perf my-3"></div>
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <div class="eyebrow mb-1">Court</div>
+      <div class="numeral text-xl">
+        <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ preview.total_court_cost | int }}
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow mb-1">Shuttle</div>
+      <div class="numeral text-xl">
+        <span style="color: var(--color-muted); font-weight: 400;">₹</span>{{ preview.total_shuttle_cost | int }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flex items-center justify-between mb-3 rise rise-3">
+  <span class="eyebrow">Per Player</span>
+  <span class="eyebrow numeral" style="color: var(--color-muted);">{{ preview.per_player|length }} · Total</span>
+</div>
+
+<ul class="space-y-2 mb-6">
+  {% for p in preview.per_player %}
+    <li class="card flex items-center justify-between rise rise-{{ loop.index + 3 if loop.index + 3 < 9 else 8 }}"
+        style="padding: 0.875rem 1.125rem;">
+      <span class="font-medium">{{ p.name }}</span>
+      <span class="numeral text-base">
+        {% if p.net > 0 %}
+          <span style="color: var(--color-accent);">+₹{{ p.net }}</span>
+        {% elif p.net < 0 %}
+          <span style="color: var(--color-negative);">−₹{{ -p.net }}</span>
+        {% else %}
+          <span style="color: var(--color-ink-2);">settled</span>
+        {% endif %}
+      </span>
+    </li>
+  {% endfor %}
+</ul>
+
+<form method="post" action="/sessions/{{ session.id }}/finalize" class="rise rise-3">
+  <button class="btn btn-primary w-full">
+    Finalize and view send buttons
+  </button>
+</form>
+
+{% endblock %}

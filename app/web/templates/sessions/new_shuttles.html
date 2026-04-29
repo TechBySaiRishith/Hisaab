@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}New session — Shuttles{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-muted);">05</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-accent);">06</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-muted);">07</span>
+      <span class="ml-2">Shuttles</span>
+    </div>
+    <a href="/sessions/{{ session.id }}/slots" class="eyebrow flex items-center gap-1"
+       style="color: var(--color-muted); text-decoration: none;">
+      <span>←</span><span>Back</span>
+    </a>
+  </div>
+  <h1 class="display text-4xl">Whose<br />tube?</h1>
+  <p class="mt-3 text-sm" style="color: var(--color-ink-2);">
+    Minutes each player's shuttles were on duty. Multiples of 30. Sum across courts.
+  </p>
+</header>
+
+<form method="post" action="/sessions/{{ session.id }}/shuttles" class="rise rise-2">
+  <div class="space-y-2 mb-6">
+    {% for p in session_players %}
+      <label class="card flex items-center justify-between gap-3" style="padding: 0.875rem 1rem;">
+        <span class="flex items-center gap-2">
+          <span style="font-size: 1.25rem;">{{ p.emoji }}</span>
+          <span class="font-medium">{{ p.name }}</span>
+        </span>
+        <div class="flex items-center gap-2">
+          <input type="number"
+                 name="player_{{ p.id }}_minutes"
+                 min="0"
+                 step="30"
+                 value="{{ existing.get(p.id, 0) }}"
+                 class="numeral text-right"
+                 style="width: 80px; padding: 0.5rem 0.625rem; background: var(--color-bg); color: var(--color-ink); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--color-line) inset; font-size: 0.95rem;" />
+          <span class="eyebrow" style="color: var(--color-muted);">min</span>
+        </div>
+      </label>
+    {% endfor %}
+  </div>
+
+  <button type="submit" class="btn btn-primary w-full">
+    Continue · Review
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M3 7h8M8 4l3 3-3 3" />
+    </svg>
+  </button>
+</form>
+
+{% endblock %}

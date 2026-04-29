@@ -1,0 +1,28 @@
+services:
+  app:
+    image: ghcr.io/{{GITHUB_OWNER}}/hisaab:latest  # replace at deploy time
+    restart: unless-stopped
+    ports: ["8080:8080"]
+    volumes:
+      - /opt/hisaab/data:/app/data
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////app/data/hisaab.db
+      LOG_LEVEL: info
+      TZ: Asia/Kolkata
+      UPI_ID: ""
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  litestream:
+    image: litestream/litestream:0.3
+    restart: unless-stopped
+    volumes:
+      - /opt/hisaab/data:/app/data
+      - /opt/hisaab/backup:/backup
+      - ./litestream.yml:/etc/litestream.yml:ro
+    command: replicate -config /etc/litestream.yml
+    depends_on:
+      - app

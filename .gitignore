@@ -16,10 +16,11 @@ htmlcov/
 dist/
 build/
 
-# IDEs
+# IDEs / per-developer tooling
 .vscode/
 .idea/
 *.swp
+.claude/
 
 # OS
 .DS_Store
@@ -31,6 +32,14 @@ Thumbs.db
 
 # Built CSS
 app/web/static/css/tailwind.output.css
+
+# Tailwind CLI standalone binary (dev-only, downloaded once per machine)
+tailwindcss.exe
+tailwindcss
+
+# Local SQLite DB (dev)
+*.db
+*.db-journal
 
 # Env
 .env

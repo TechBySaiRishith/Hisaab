@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit player" if player else "New player" }}{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="eyebrow mb-3">{{ "Edit" if player else "Add" }} · Player</div>
+  <h1 class="display text-4xl">{{ "Edit." if player else "Sign 'em up." }}</h1>
+</header>
+
+<form method="post" action="{{ '/players/' + (player.id|string) + '/edit' if player else '/players' }}" class="rise rise-2">
+  <div class="field">
+    <label class="field-label" for="name">Name</label>
+    <input id="name" name="name" value="{{ player.name if player else '' }}" required class="field-input" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="emoji">Avatar</label>
+    <input id="emoji" name="emoji" maxlength="8" value="{{ player.emoji if player else '🏸' }}" class="field-input" style="font-size: 1.25rem;" />
+  </div>
+
+  {% if not player %}
+  <div class="field">
+    <label class="field-label" for="phone">WhatsApp phone <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">(optional)</span></label>
+    <input id="phone" name="phone" type="tel" placeholder="+91 9876543210" class="field-input numeral" autocomplete="off" />
+  </div>
+  {% else %}
+  <div class="field">
+    <label class="field-label">WhatsApp phone</label>
+    <div class="field-input numeral" style="color: var(--color-ink-2);">
+      {% if player.phones %}{{ player.phones[0].e164_number }}{% else %}(none){% endif %}
+    </div>
+    <div class="text-xs mt-1" style="color: var(--color-muted);">Phone is set when first creating a player. Coming soon: edit phone.</div>
+  </div>
+  {% endif %}
+
+  <div class="field">
+    <label class="field-label" for="message_template">
+      Custom WhatsApp message
+      <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">
+        (optional · overrides default for this player)
+      </span>
+    </label>
+    <textarea id="message_template"
+              name="message_template"
+              rows="9"
+              class="field-textarea"
+              placeholder="Leave blank to use the default template from Settings"
+              style="font-family: var(--font-family-mono); font-size: 0.85rem; line-height: 1.55;">{{ player.message_template if player and player.message_template else '' }}</textarea>
+    <div class="mt-3 p-3 rounded" style="background: var(--color-surface-2); border: 1px dashed var(--color-line);">
+      <div class="eyebrow mb-2">Available tokens</div>
+      <div class="flex flex-wrap gap-1.5">
+        {% for tok in ['{name}', '{played_on}', '{venue}', '{owes_court}', '{owes_shuttle}', '{abs_net}', '{direction}', '{credit_lines}', '{upi_line}'] %}
+          <span class="numeral text-xs px-2 py-0.5 rounded" style="background: var(--color-bg); color: var(--color-ink-2); box-shadow: 0 0 0 1px var(--color-line) inset;">{{ tok }}</span>
+        {% endfor %}
+      </div>
+      <div class="text-xs mt-2" style="color: var(--color-muted);">
+        Tap the textarea and use these tokens — they'll be replaced when generating each session's WhatsApp link.
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary w-full mt-8">Save player</button>
+  <a href="/players" class="btn btn-ghost w-full mt-3">Cancel</a>
+</form>
+
+{% endblock %}

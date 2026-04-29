@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}New session — Bookers{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-muted);">03</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-accent);">04</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-muted);">07</span>
+      <span class="ml-2">Bookers</span>
+    </div>
+    <button type="button" onclick="history.back()" class="eyebrow flex items-center gap-1"
+            style="color: var(--color-muted); background: transparent; border: 0; cursor: pointer;">
+      <span>←</span><span>Back</span>
+    </button>
+  </div>
+  <h1 class="display text-4xl">Who<br />booked?</h1>
+  <p class="mt-3 text-sm" style="color: var(--color-ink-2);">
+    Bookers paid for the court upfront — they get reimbursed.
+  </p>
+</header>
+
+<form method="post" action="/sessions/{{ session.id }}/courts" class="space-y-3 rise rise-2">
+  {% for court in session.courts %}
+    {% set i = loop.index %}
+    <div class="ticket" style="padding: 1.125rem 1.25rem;">
+      <div class="flex items-center justify-between mb-3">
+        <span class="eyebrow">Court · {{ "%02d"|format(i) }}</span>
+        <span class="chip-mini">{{ "%.1f"|format(court.duration_minutes / 60) }} hr</span>
+      </div>
+      <div class="field" style="margin-top: 0;">
+        <label class="field-label" for="court_{{ i }}_label">Label</label>
+        <input id="court_{{ i }}_label" name="court_{{ i }}_label"
+               value="{{ court.label }}" required class="field-input" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="court_{{ i }}_booker">Booker</label>
+        <select id="court_{{ i }}_booker" name="court_{{ i }}_booker" required class="field-select">
+          {% for p in session_players %}
+            <option value="{{ p.id }}" {% if p.id == court.booker_player_id %}selected{% endif %}>
+              {{ p.emoji }} {{ p.name }}{% if p.is_self %} (you){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary w-full mt-6">
+    Continue · Slot grid
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M3 7h8M8 4l3 3-3 3" />
+    </svg>
+  </button>
+</form>
+
+{% endblock %}

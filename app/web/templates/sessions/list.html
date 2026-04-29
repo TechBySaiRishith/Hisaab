@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Hisaab — Sessions{% endblock %}
+{% block content %}
+
+<header class="mb-10 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <span class="eyebrow">Court &amp; Shuttle · Match Log</span>
+    <span class="eyebrow">{{ sessions|length if sessions else "00" }} / Total</span>
+  </div>
+  <h1 class="display display-xl">
+    Hisaab<span style="color: var(--color-accent);">.</span>
+  </h1>
+  <p class="mt-4 text-sm" style="color: var(--color-ink-2); max-width: 28ch;">
+    Slot-fair splits. Per-player WhatsApp. Settle up tonight, not next week.
+  </p>
+</header>
+
+{% if sessions %}
+  <div class="flex items-center justify-between mb-4 rise rise-2">
+    <span class="eyebrow">Recent</span>
+    <span class="eyebrow numeral" style="color: var(--color-muted);">↑ Newest</span>
+  </div>
+  <ul class="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-5 mb-12">
+    {% for s in sessions %}
+      <li class="rise rise-{{ loop.index + 2 if loop.index + 2 < 9 else 8 }}">
+        <a href="/sessions/{{ s.id }}" class="ticket block transition-transform active:translate-y-px hover:translate-y-[-1px]"
+           style="text-decoration: none; color: inherit;">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <div class="min-w-0">
+              <div class="eyebrow mb-1.5">{{ s.played_on.strftime('%a · %d %b %Y') }}</div>
+              <div class="display text-2xl truncate" style="font-stretch: 95%;">{{ s.venue_name }}</div>
+            </div>
+            <span class="status" data-state="{{ s.status }}">{{ s.status }}</span>
+          </div>
+          <div class="perf my-3"></div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <div class="eyebrow mb-1">Players</div>
+              <div class="numeral text-lg">{{ s.player_count }}</div>
+            </div>
+            <div>
+              <div class="eyebrow mb-1">Hours</div>
+              <div class="numeral text-lg">{{ "%.1f"|format(s.duration_minutes / 60) }}</div>
+            </div>
+            <div>
+              <div class="eyebrow mb-1">Courts</div>
+              <div class="numeral text-lg">{{ s.court_count }}</div>
+            </div>
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <div class="card text-center rise rise-2" style="padding: 2.5rem 1.25rem;">
+    <div style="font-size: 2.5rem; line-height: 1;">🏸</div>
+    <div class="mt-4 display text-xl">No sessions yet.</div>
+    <div class="mt-2 text-sm" style="color: var(--color-ink-2);">
+      Start your first match log below.
+    </div>
+  </div>
+{% endif %}
+
+<a href="/sessions/new"
+   class="fixed right-5 bottom-24 lg:bottom-8 lg:right-8 z-30 fab-glow flex items-center gap-2 px-5 py-4 rounded-full font-medium"
+   style="background: var(--color-accent); color: var(--color-accent-fg);
+          font-family: var(--font-family-mono); font-size: 0.7rem;
+          letter-spacing: 0.16em; text-transform: uppercase;
+          text-decoration: none;
+          box-shadow: var(--shadow-fab);">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="7" y1="2" x2="7" y2="12" />
+    <line x1="2" y1="7" x2="12" y2="7" />
+  </svg>
+  New Match
+</a>
+
+{% endblock %}

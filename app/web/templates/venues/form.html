@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit venue" if venue else "New venue" }}{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="eyebrow mb-3">{{ "Edit" if venue else "Add" }} · Venue</div>
+  <h1 class="display text-4xl">{{ "Edit rates." if venue else "New court." }}</h1>
+</header>
+
+<form method="post" action="/venues" class="rise rise-2">
+  <div class="field">
+    <label class="field-label" for="venue_name">Name</label>
+    <input id="venue_name" name="name" value="{{ venue.name if venue else '' }}" required class="field-input" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="court_rate">Court rate <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">(₹ / hour)</span></label>
+    <input id="court_rate" type="number" name="court_rate" min="0" step="0.01"
+           value="{{ venue.current_court_rate_per_hour if venue else '' }}" required class="field-input numeral" />
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="shuttle_rate">Shuttle rate <span style="color: var(--color-muted); text-transform: none; letter-spacing: 0;">(₹ / hour)</span></label>
+    <input id="shuttle_rate" type="number" name="shuttle_rate" min="0" step="0.01"
+           value="{{ venue.current_shuttle_rate_per_hour if venue else '' }}" required class="field-input numeral" />
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="effective_from">Effective from</label>
+    <input id="effective_from" type="date" name="effective_from" value="{{ today }}" required class="field-input numeral" />
+  </div>
+
+  <button type="submit" class="btn btn-primary w-full mt-8">Save venue</button>
+  <a href="/venues" class="btn btn-ghost w-full mt-3">Cancel</a>
+</form>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}New session — Players{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-muted);">01</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-accent);">02</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-muted);">07</span>
+      <span class="ml-2">Players</span>
+    </div>
+    <a href="/sessions/new" class="eyebrow flex items-center gap-1" style="color: var(--color-muted); text-decoration: none;">
+      <span>←</span><span>Back</span>
+    </a>
+  </div>
+  <h1 class="display text-4xl">Who's<br />on roll?</h1>
+  <p class="mt-3 text-sm" style="color: var(--color-ink-2);">Tap a name to add. Add a guest below.</p>
+</header>
+
+<form method="post" action="/sessions/new/court-count" class="rise rise-2">
+  {% if venue_id %}<input type="hidden" name="venue_id" value="{{ venue_id }}" />{% endif %}
+  {% if played_on %}<input type="hidden" name="played_on" value="{{ played_on }}" />{% endif %}
+
+  {% if self_player %}
+    <div class="mb-5">
+      <div class="eyebrow mb-2" style="color: var(--color-muted);">Always you</div>
+      <label class="chip" style="font-size: 0.95rem;">
+        <input type="checkbox" name="player_ids" value="{{ self_player.id }}" class="sr-only" checked />
+        <span style="font-size: 1.1rem;">{{ self_player.emoji }}</span>
+        <span class="font-medium">{{ self_player.name }}</span>
+        <span class="numeral text-[0.6rem] ml-1 px-1.5 py-0.5 rounded"
+              style="background: color-mix(in oklch, currentColor 18%, transparent); letter-spacing: 0.14em;">YOU</span>
+      </label>
+      <div class="text-xs mt-2" style="color: var(--color-muted);">
+        Uncheck if you didn't actually play this session.
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="eyebrow mb-2" style="color: var(--color-muted);">Roster</div>
+  <div class="flex flex-wrap gap-2 mb-6">
+    {% for p in players %}
+      <label class="chip">
+        <input type="checkbox" name="player_ids" value="{{ p.id }}" class="sr-only" />
+        <span style="font-size: 1rem;">{{ p.emoji }}</span>
+        <span>{{ p.name }}</span>
+      </label>
+    {% endfor %}
+  </div>
+
+  <details class="card mb-6" style="padding: 1rem 1.25rem;">
+    <summary class="cursor-pointer eyebrow flex items-center justify-between" style="color: var(--color-ink);">
+      <span>+ Add guest</span>
+      <span style="color: var(--color-muted);">▾</span>
+    </summary>
+    <div class="mt-4 space-y-3">
+      <input name="guest_name" placeholder="Guest name" class="field-input" />
+      <input name="guest_phone" placeholder="+91… (optional)" class="field-input numeral" />
+      <button formaction="/sessions/new/players/add-guest" formmethod="post" class="btn btn-ghost w-full">
+        Add to session
+      </button>
+    </div>
+  </details>
+
+  <button type="submit" class="btn btn-primary w-full">
+    Continue · Courts
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M3 7h8M8 4l3 3-3 3" />
+    </svg>
+  </button>
+</form>
+
+{% endblock %}

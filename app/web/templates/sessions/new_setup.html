@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}New session — Setup{% endblock %}
+{% block content %}
+
+<header class="mb-8 rise rise-1">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2 eyebrow">
+      <span class="numeral" style="color: var(--color-accent);">01</span>
+      <span style="color: var(--color-line);">/</span>
+      <span class="numeral" style="color: var(--color-muted);">07</span>
+      <span class="ml-2">Setup</span>
+    </div>
+    <a href="/" class="eyebrow" style="color: var(--color-muted); text-decoration: none;">Cancel</a>
+  </div>
+  <h1 class="display text-4xl">When &amp;<br />where.</h1>
+</header>
+
+<form method="post" action="/sessions/new/players" class="rise rise-2">
+  <div class="field">
+    <label class="field-label" for="venue_id">Venue</label>
+    <select id="venue_id" name="venue_id" required class="field-select">
+      {% for v in venues %}
+        <option value="{{ v.id }}">{{ v.name }} — ₹{{ v.current_court_rate_per_hour }}/hr</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="played_on">Date</label>
+    <input id="played_on" type="date" name="played_on" value="{{ today }}" required class="field-input numeral" />
+  </div>
+
+  <button type="submit" class="btn btn-primary w-full mt-8">
+    Continue · Players
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M3 7h8M8 4l3 3-3 3" />
+    </svg>
+  </button>
+</form>
+
+{% endblock %}

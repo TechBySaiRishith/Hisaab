@@ -1,0 +1,17 @@
+<button id="slot-{{ slot.id }}"
+        type="button"
+        hx-get="/sessions/{{ session.id }}/slots/{{ slot.id }}/picker"
+        hx-trigger="click"
+        hx-target="#slot-picker"
+        class="rounded-lg cursor-pointer min-h-[64px] p-2 flex flex-wrap gap-1 content-start text-left transition-colors hover:bg-[var(--color-surface-3)]"
+        style="background: var(--color-surface-2); box-shadow: 0 0 0 1px var(--color-line) inset;">
+  {% for sp in slot.players %}
+    <span class="numeral text-[0.7rem] px-1.5 py-0.5 rounded font-medium"
+          style="background: var(--color-accent-soft); color: var(--color-accent);">
+      {{ sp.player.emoji }}{{ sp.player.name[0]|upper }}
+    </span>
+  {% endfor %}
+  {% if not slot.players %}
+    <span class="self-center mx-auto text-xs" style="color: var(--color-muted);">+ tap</span>
+  {% endif %}
+</button>

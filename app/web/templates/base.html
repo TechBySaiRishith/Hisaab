@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#181c2a" media="(prefers-color-scheme: dark)" />
+  <title>{% block title %}Hisaab{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+
+  <link rel="stylesheet" href="/static/css/tailwind.output.css" />
+  <script defer src="/static/js/htmx.min.js"></script>
+
+  <script>
+    // Theme bootstrap — runs synchronously before paint to prevent flash
+    (function () {
+      var saved = localStorage.getItem("theme");
+      var sysDark = matchMedia("(prefers-color-scheme: dark)").matches;
+      if (saved === "dark" || (!saved && sysDark)) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
+</head>
+<body class="min-h-screen">
+
+  <!-- ── Desktop sidebar (lg+) ───────────────────────────────────── -->
+  <aside class="hidden lg:flex fixed inset-y-0 left-0 z-30 w-[240px] flex-col px-5 py-7 border-r"
+         style="border-color: var(--color-line); background: var(--color-surface);">
+    <a href="/" class="block mb-12" style="text-decoration: none; color: inherit;">
+      <div class="display text-3xl" style="line-height: 1; font-stretch: 92%;">
+        Hisaab<span style="color: var(--color-accent);">.</span>
+      </div>
+      <div class="eyebrow mt-2" style="color: var(--color-muted);">Settle up · Court &amp; Shuttle</div>
+    </a>
+
+    <nav class="flex flex-col gap-1">
+      <a href="/" data-nav="sessions" class="nav-link-side">
+        <span class="nav-side-marker"></span>
+        <span>Sessions</span>
+      </a>
+      <a href="/players" data-nav="players" class="nav-link-side">
+        <span class="nav-side-marker"></span>
+        <span>Roster</span>
+      </a>
+      <a href="/venues" data-nav="venues" class="nav-link-side">
+        <span class="nav-side-marker"></span>
+        <span>Venues</span>
+      </a>
+      <a href="/settings" data-nav="settings" class="nav-link-side">
+        <span class="nav-side-marker"></span>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="mt-auto flex items-center justify-between pt-6 border-t" style="border-color: var(--color-line);">
+      <div>
+        <div class="eyebrow mb-1" style="color: var(--color-muted);">Theme</div>
+        <div class="text-xs" style="color: var(--color-ink-2);" id="theme-label-side">Auto</div>
+      </div>
+      <button type="button" onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main content ────────────────────────────────────────────── -->
+  <main class="lg:ml-[240px] mx-auto px-5 pt-8 pb-32 lg:pb-16 lg:px-10 lg:pt-12 max-w-[480px] md:max-w-[640px] lg:max-w-[860px]">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Mobile bottom nav (hidden on lg+) ───────────────────────── -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 backdrop-blur-md"
+       style="background: color-mix(in oklch, var(--color-bg) 85%, transparent);">
+    <div class="border-t" style="border-color: var(--color-line);">
+      <div class="max-w-[480px] mx-auto grid grid-cols-4 px-3 py-2 gap-1">
+        <a href="/" class="nav-link" data-nav="sessions">
+          <span class="nav-dot"></span>
+          <span>Sessions</span>
+        </a>
+        <a href="/players" class="nav-link" data-nav="players">
+          <span class="nav-dot"></span>
+          <span>Roster</span>
+        </a>
+        <a href="/settings" class="nav-link" data-nav="settings">
+          <span class="nav-dot"></span>
+          <span>Settings</span>
+        </a>
+        <button type="button" onclick="toggleTheme()" class="nav-link" aria-label="Toggle theme">
+          <span class="nav-dot"></span>
+          <span id="theme-label-mobile">Theme</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    function setTheme(t) {
+      if (t === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      localStorage.setItem("theme", t);
+      var label = document.getElementById("theme-label-side");
+      if (label) label.textContent = (t === "dark") ? "Dark" : "Light";
+    }
+    function toggleTheme() {
+      setTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");
+    }
+    // Initialize label
+    (function () {
+      var saved = localStorage.getItem("theme");
+      var label = document.getElementById("theme-label-side");
+      if (label) label.textContent = saved ? (saved === "dark" ? "Dark" : "Light") : "Auto";
+    })();
+
+    // Active nav highlighting (mobile + desktop) based on URL
+    (function () {
+      var path = window.location.pathname;
+      var active = "sessions";
+      if (path.startsWith("/players")) active = "players";
+      else if (path.startsWith("/venues")) active = "venues";
+      else if (path.startsWith("/settings")) active = "settings";
+      document.querySelectorAll("[data-nav]").forEach(function (el) {
+        el.setAttribute("data-active", el.dataset.nav === active);
+      });
+    })();
+  </script>
+</body>
+</html>

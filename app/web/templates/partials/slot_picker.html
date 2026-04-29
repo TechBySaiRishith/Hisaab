@@ -1,0 +1,23 @@
+<div class="card mx-auto max-w-[440px]"
+     style="box-shadow: 0 16px 48px -16px oklch(0% 0 0 / 0.6), 0 0 0 1px var(--color-line) inset;">
+  <div class="flex items-center justify-between mb-3">
+    <span class="eyebrow">Tap to add or remove</span>
+    <button type="button"
+            onclick="this.closest('#slot-picker').innerHTML='';"
+            class="text-xs"
+            style="color: var(--color-muted);">close</button>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% for p in players %}
+      <button type="button"
+              hx-post="/sessions/{{ session_id }}/slots/{{ slot_id }}/toggle/{{ p.id }}"
+              hx-target="#slot-{{ slot_id }}"
+              hx-swap="outerHTML"
+              class="chip"
+              {% if p.id in current_player_ids %}data-selected="true"{% endif %}>
+        <span style="font-size: 1rem;">{{ p.emoji }}</span>
+        <span>{{ p.name }}</span>
+      </button>
+    {% endfor %}
+  </div>
+</div>
