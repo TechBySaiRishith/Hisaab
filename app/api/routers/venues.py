@@ -1,4 +1,5 @@
 """Venue REST endpoints."""
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -31,7 +32,8 @@ async def list_venues(session: AsyncSession = Depends(get_session)) -> list[Venu
 
 @router.post("", response_model=VenueOut, status_code=status.HTTP_201_CREATED)
 async def create_venue(
-    payload: VenueCreate, session: AsyncSession = Depends(get_session)  # noqa: B008
+    payload: VenueCreate,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> VenueOut:
     repo = VenueRepository(session)
     v = await repo.create(

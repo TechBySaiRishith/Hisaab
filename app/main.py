@@ -1,4 +1,5 @@
 """FastAPI app factory and uvicorn entrypoint."""
+
 from __future__ import annotations
 
 import os
@@ -21,11 +22,10 @@ def build_app(database_url: str | None = None) -> FastAPI:
         # Production path: read settings from environment.
         # Falls back to the legacy env-var default so existing dev workflows
         # (e.g. `make dev`) still work without a .env file.
-        _default_dsn = os.environ.get(
-            "DATABASE_URL", "sqlite+aiosqlite:///./data/badminton.db"
-        )
+        _default_dsn = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///./data/badminton.db")
         try:
             from app.config.settings import Settings
+
             settings = Settings()
             dsn = settings.database_url
             log_level = settings.log_level
@@ -53,6 +53,7 @@ def build_app(database_url: str | None = None) -> FastAPI:
                 from app.persistence.orm import AppSettings
                 from app.persistence.repositories.player import PlayerRepository
                 from app.services.messaging import DEFAULT_TEMPLATE
+
                 existing = (
                     await s.execute(select(AppSettings).where(AppSettings.id == 1))
                 ).scalar_one_or_none()
@@ -104,7 +105,11 @@ def build_app(database_url: str | None = None) -> FastAPI:
                 "id": x.id,
                 "played_on": x.played_on,
                 "venue_name": venues[x.venue_id].name if x.venue_id in venues else "?",
-                "player_count": len({sp.player_id for c in x.courts for sl in c.slots for sp in sl.players}) if x.courts else 0,
+                "player_count": len(
+                    {sp.player_id for c in x.courts for sl in c.slots for sp in sl.players}
+                )
+                if x.courts
+                else 0,
                 "duration_minutes": x.duration_minutes,
                 "court_count": len(x.courts),
                 "status": x.status,

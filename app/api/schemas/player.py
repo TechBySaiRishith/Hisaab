@@ -1,4 +1,5 @@
 """Pydantic schemas for player endpoints."""
+
 from __future__ import annotations
 
 import phonenumbers

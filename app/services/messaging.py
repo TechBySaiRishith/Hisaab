@@ -1,4 +1,5 @@
 """WhatsApp message generation. wa.me link + text rendering."""
+
 from __future__ import annotations
 
 from urllib.parse import quote
@@ -25,11 +26,7 @@ def build_message_text(
     venue: str,
     upi_id: str | None,
 ) -> str:
-    direction = (
-        "you owe me" if player.net > 0
-        else "I owe you" if player.net < 0
-        else "settled"
-    )
+    direction = "you owe me" if player.net > 0 else "I owe you" if player.net < 0 else "settled"
     credit_lines = ""
     if player.credit_total > 0:
         if player.credit_court > 0:

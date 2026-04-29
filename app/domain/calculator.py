@@ -3,6 +3,7 @@
 Reads a SessionInput and returns a SessionResult. No I/O, no framework.
 See docs/superpowers/specs/2026-04-29-badminton-splitter-design.md §4.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict

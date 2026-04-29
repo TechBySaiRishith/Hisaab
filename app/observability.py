@@ -1,4 +1,5 @@
 """Logging (structlog) + Prometheus metrics setup."""
+
 from __future__ import annotations
 
 import logging
@@ -29,9 +30,7 @@ def configure_structlog(level: str = "info") -> None:
             structlog.processors.add_log_level,
             structlog.processors.JSONRenderer(),
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(logging, level.upper())
-        ),
+        wrapper_class=structlog.make_filtering_bound_logger(getattr(logging, level.upper())),
     )
 
 

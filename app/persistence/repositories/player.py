@@ -1,4 +1,5 @@
 """Player repository — only place that touches the players + player_phones tables."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -28,11 +29,7 @@ class PlayerRepository:
         return p
 
     async def get(self, player_id: int) -> Player | None:
-        stmt = (
-            select(Player)
-            .where(Player.id == player_id)
-            .options(selectinload(Player.phones))
-        )
+        stmt = select(Player).where(Player.id == player_id).options(selectinload(Player.phones))
         return (await self._s.execute(stmt)).scalar_one_or_none()
 
     async def list_active(self, *, include_self: bool = False) -> Sequence[Player]:

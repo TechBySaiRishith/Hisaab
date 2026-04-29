@@ -2,6 +2,7 @@
 
 Migrations in alembic/versions/ derive from this module.
 """
+
 from __future__ import annotations
 
 from datetime import date, datetime, time
@@ -39,7 +40,9 @@ class Player(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     message_template: Mapped[str | None] = mapped_column(Text, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
@@ -54,11 +57,15 @@ class PlayerPhone(Base):
     __table_args__ = (UniqueConstraint("player_id", "e164_number", name="uq_player_phone"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    player_id: Mapped[int] = mapped_column(ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
+    player_id: Mapped[int] = mapped_column(
+        ForeignKey("players.id", ondelete="CASCADE"), nullable=False
+    )
     country_code: Mapped[str] = mapped_column(String(4), default="IN", nullable=False)
     e164_number: Mapped[str] = mapped_column(String(20), nullable=False)
     is_primary: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
 
     player: Mapped[Player] = relationship(back_populates="phones")
 
@@ -71,7 +78,9 @@ class Venue(Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     current_court_rate_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     current_shuttle_rate_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
@@ -85,11 +94,15 @@ class VenueRateHistory(Base):
     __tablename__ = "venue_rate_history"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    venue_id: Mapped[int] = mapped_column(ForeignKey("venues.id", ondelete="CASCADE"), nullable=False)
+    venue_id: Mapped[int] = mapped_column(
+        ForeignKey("venues.id", ondelete="CASCADE"), nullable=False
+    )
     effective_from: Mapped[date] = mapped_column(Date, nullable=False)
     court_rate_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     shuttle_rate_per_hour: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
 
     venue: Mapped[Venue] = relationship(back_populates="rate_history")
 
@@ -110,7 +123,9 @@ class Session(Base):
     )
     snapshot_court_rate: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
     snapshot_shuttle_rate: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
     finalized_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
@@ -128,11 +143,15 @@ class Court(Base):
     __tablename__ = "courts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    session_id: Mapped[int] = mapped_column(ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("sessions.id", ondelete="CASCADE"), nullable=False
+    )
     label: Mapped[str] = mapped_column(String(50), nullable=False)
     booker_player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
 
     session: Mapped[Session] = relationship(back_populates="courts")
     slots: Mapped[list[Slot]] = relationship(
@@ -145,7 +164,9 @@ class Slot(Base):
     __table_args__ = (UniqueConstraint("court_id", "slot_index", name="uq_slot_index"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    court_id: Mapped[int] = mapped_column(ForeignKey("courts.id", ondelete="CASCADE"), nullable=False)
+    court_id: Mapped[int] = mapped_column(
+        ForeignKey("courts.id", ondelete="CASCADE"), nullable=False
+    )
     slot_index: Mapped[int] = mapped_column(Integer, nullable=False)
 
     court: Mapped[Court] = relationship(back_populates="slots")
@@ -168,9 +189,7 @@ class SlotPlayer(Base):
 
 class ShuttleContribution(Base):
     __tablename__ = "shuttle_contributions"
-    __table_args__ = (
-        UniqueConstraint("session_id", "owner_player_id", name="uq_session_owner"),
-    )
+    __table_args__ = (UniqueConstraint("session_id", "owner_player_id", name="uq_session_owner"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     session_id: Mapped[int] = mapped_column(
@@ -178,7 +197,9 @@ class ShuttleContribution(Base):
     )
     owner_player_id: Mapped[int] = mapped_column(ForeignKey("players.id"), nullable=False)
     total_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )

@@ -1,4 +1,5 @@
 """HTML routes for venues."""
+
 from __future__ import annotations
 
 from datetime import date
@@ -16,13 +17,12 @@ router = APIRouter(tags=["web:venues"])
 
 @router.get("/venues", response_class=HTMLResponse)
 async def list_venues_html(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     venues = await VenueRepository(session).list_all()
     templates = request.app.state.templates
-    return templates.TemplateResponse(
-        request, "venues/list.html", {"venues": venues}
-    )
+    return templates.TemplateResponse(request, "venues/list.html", {"venues": venues})
 
 
 @router.get("/venues/new", response_class=HTMLResponse)
@@ -35,7 +35,8 @@ async def new_venue_form(request: Request) -> HTMLResponse:
 
 @router.post("/venues")
 async def create_venue_html(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     form = await request.form()
     name = str(form.get("name", "")).strip()

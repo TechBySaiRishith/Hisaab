@@ -1,4 +1,5 @@
 """HTML routes for the session wizard."""
+
 from __future__ import annotations
 
 from datetime import date as _date
@@ -23,7 +24,7 @@ router = APIRouter(tags=["web:sessions"])
 @router.get("/sessions/new", response_class=HTMLResponse)
 async def new_session_setup(
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     venues = await VenueRepository(session).list_all()
     templates = request.app.state.templates
@@ -36,7 +37,8 @@ async def new_session_setup(
 
 @router.get("/sessions/new/players", response_class=HTMLResponse)
 async def new_session_players(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     repo = PlayerRepository(session)
     players = await repo.list_active()
@@ -51,7 +53,8 @@ async def new_session_players(
 
 @router.post("/sessions/new/players", response_class=HTMLResponse)
 async def new_session_players_post(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     """Step 1 POST: collect setup form data and re-render the players page."""
     form = await request.form()
@@ -75,7 +78,8 @@ async def new_session_players_post(
 
 @router.post("/sessions/new/court-count", response_class=HTMLResponse)
 async def new_session_court_count_form(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     """Step 2 → Step 3 transition: render the court count + duration form,
     carrying venue + date + player_ids forward as hidden fields."""
@@ -97,7 +101,8 @@ async def new_session_court_count_form(
 
 @router.post("/sessions/new/courts")
 async def new_session_create_draft_and_show_courts(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     """Step 3 submit: collect court_count + per-court durations, create draft.
     Session-level duration is derived as the max of court durations.
@@ -154,7 +159,7 @@ async def new_session_create_draft_and_show_courts(
 async def show_session_courts_step(
     session_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     s = await SessionRepository(session).get_aggregate(session_id)
     if s is None:
@@ -174,7 +179,7 @@ async def show_session_courts_step(
 async def submit_courts_step(
     session_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     """Update labels + bookers on the existing court rows. Durations are
     preserved from when the draft was created in step 3."""
@@ -200,9 +205,7 @@ async def submit_courts_step(
         ]
         # Pad if needed (shouldn't be — but safety)
         while len(existing_assignments) < n_slots:
-            existing_assignments.append(
-                existing_assignments[-1] if existing_assignments else set()
-            )
+            existing_assignments.append(existing_assignments[-1] if existing_assignments else set())
         courts.append(
             cast(
                 "CourtInputDict",
@@ -222,7 +225,7 @@ async def submit_courts_step(
 async def show_slots_step(
     session_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     from sqlalchemy import select as sa_select
     from sqlalchemy.orm import selectinload as _selectinload
@@ -268,13 +271,9 @@ async def get_slot_picker(
     session_id: int,
     slot_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
-    stmt = (
-        _select(Slot)
-        .where(Slot.id == slot_id)
-        .options(selectinload(Slot.players))
-    )
+    stmt = _select(Slot).where(Slot.id == slot_id).options(selectinload(Slot.players))
     slot = (await session.execute(stmt)).scalar_one_or_none()
     if slot is None:
         raise HTTPException(404, f"slot {slot_id} not found")
@@ -302,13 +301,11 @@ async def toggle_slot_player(
     slot_id: int,
     player_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     from app.persistence.orm import Session
 
-    await SessionRepository(session).toggle_slot_player(
-        slot_id=slot_id, player_id=player_id
-    )
+    await SessionRepository(session).toggle_slot_player(slot_id=slot_id, player_id=player_id)
     stmt = (
         _select(Slot)
         .where(Slot.id == slot_id)
@@ -332,7 +329,9 @@ async def toggle_slot_player(
 
 @router.get("/sessions/{session_id}/shuttles", response_class=HTMLResponse)
 async def show_shuttles_step(
-    session_id: int, request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     s = await SessionRepository(session).get_aggregate(session_id)
     if s is None:
@@ -355,7 +354,9 @@ async def show_shuttles_step(
 
 @router.post("/sessions/{session_id}/shuttles")
 async def submit_shuttles(
-    session_id: int, request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     from typing import cast
 
@@ -380,7 +381,9 @@ async def submit_shuttles(
 
 @router.get("/sessions/{session_id}/review", response_class=HTMLResponse)
 async def show_review_step(
-    session_id: int, request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     s = await SessionRepository(session).get_aggregate(session_id)
     if s is None:
@@ -407,7 +410,8 @@ async def show_review_step(
 
 @router.post("/sessions/{session_id}/finalize")
 async def finalize_session_html(
-    session_id: int, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     await SessionService(session).finalize_and_compute(session_id)
     return RedirectResponse(f"/sessions/{session_id}", status_code=303)
@@ -417,7 +421,7 @@ async def finalize_session_html(
 async def show_session_result(
     session_id: int,
     request: Request,
-    session: AsyncSession = Depends(get_session)  # noqa: B008
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     from app.persistence.orm import AppSettings
     from app.services.messaging import DEFAULT_TEMPLATE, build_message_text, build_wa_me_url
@@ -517,7 +521,8 @@ async def show_session_result(
 
 @router.post("/sessions/{session_id}/mark-sent")
 async def mark_session_sent(
-    session_id: int, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     await SessionRepository(session).mark_sent(session_id)
     return RedirectResponse(f"/sessions/{session_id}", status_code=303)

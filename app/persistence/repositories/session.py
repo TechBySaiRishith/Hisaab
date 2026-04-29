@@ -1,4 +1,5 @@
 """Session repository — manages sessions, courts, slots, slot players, shuttle contribs."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -131,9 +132,7 @@ class SessionRepository:
             return
         s.status = "finalized"
 
-    async def update_courts(
-        self, session_id: int, *, courts: list[CourtInputDict]
-    ) -> None:
+    async def update_courts(self, session_id: int, *, courts: list[CourtInputDict]) -> None:
         s = await self.get_aggregate(session_id)
         if s is None:
             raise ValueError(f"session {session_id} not found")
@@ -157,9 +156,7 @@ class SessionRepository:
                     self._s.add(SlotPlayer(slot_id=slot.id, player_id=pid))
         await self._s.flush()
 
-    async def toggle_slot_player(
-        self, *, slot_id: int, player_id: int
-    ) -> bool:
+    async def toggle_slot_player(self, *, slot_id: int, player_id: int) -> bool:
         """Toggle a player on/off a slot. Returns True if now on, False if removed."""
         stmt = select(SlotPlayer).where(
             SlotPlayer.slot_id == slot_id, SlotPlayer.player_id == player_id

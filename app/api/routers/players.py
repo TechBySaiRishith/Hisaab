@@ -1,4 +1,5 @@
 """Player REST endpoints."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -33,7 +34,8 @@ async def list_players(session: AsyncSession = Depends(get_session)) -> list[Pla
 
 @router.post("", response_model=PlayerOut, status_code=status.HTTP_201_CREATED)
 async def create_player(
-    payload: PlayerCreate, session: AsyncSession = Depends(get_session)  # noqa: B008
+    payload: PlayerCreate,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> PlayerOut:
     repo = PlayerRepository(session)
     p = await repo.create(name=payload.name, emoji=payload.emoji, is_guest=payload.is_guest)

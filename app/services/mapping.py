@@ -1,4 +1,5 @@
 """Map ORM session aggregates to pure-domain SessionInput."""
+
 from __future__ import annotations
 
 from decimal import Decimal
@@ -40,9 +41,7 @@ async def session_orm_to_domain(session: AsyncSession, s: ORMSession) -> Session
     )
 
     contribs = tuple(
-        ShuttleContributionInput(
-            owner_player_id=sc.owner_player_id, total_minutes=sc.total_minutes
-        )
+        ShuttleContributionInput(owner_player_id=sc.owner_player_id, total_minutes=sc.total_minutes)
         for sc in s.shuttle_contributions
     )
 

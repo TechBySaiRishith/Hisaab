@@ -1,4 +1,5 @@
 """Session orchestration. Wraps repositories + domain calculator."""
+
 from __future__ import annotations
 
 from datetime import date, time

@@ -10,6 +10,7 @@ SQLAlchemy module that imports greenlet.  In practice, insert
 ``import app.persistence._greenlet_stub  # noqa: F401`` as the very first
 import in your conftest.py.
 """
+
 from __future__ import annotations
 
 import sys
@@ -217,6 +218,7 @@ class _MainGreenlet(greenlet):
 # --------------------------------------------------------------------------- #
 # Patch sys.modules so that "import greenlet" resolves to this stub            #
 # --------------------------------------------------------------------------- #
+
 
 def _install() -> None:
     """Install the stub into ``sys.modules`` unless the real C extension loads."""

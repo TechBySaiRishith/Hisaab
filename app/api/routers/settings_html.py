@@ -1,4 +1,5 @@
 """HTML routes for application settings."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
@@ -19,9 +20,7 @@ async def _get_or_create_settings(session: AsyncSession) -> AppSettings:
         await session.execute(select(AppSettings).where(AppSettings.id == 1))
     ).scalar_one_or_none()
     if settings is None:
-        settings = AppSettings(
-            id=1, upi_id=None, message_template=DEFAULT_TEMPLATE, theme="system"
-        )
+        settings = AppSettings(id=1, upi_id=None, message_template=DEFAULT_TEMPLATE, theme="system")
         session.add(settings)
         await session.flush()
     return settings
@@ -29,7 +28,8 @@ async def _get_or_create_settings(session: AsyncSession) -> AppSettings:
 
 @router.get("/settings", response_class=HTMLResponse)
 async def show_settings(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     settings = await _get_or_create_settings(session)
     self_player = await PlayerRepository(session).ensure_self()
@@ -43,7 +43,8 @@ async def show_settings(
 
 @router.post("/settings")
 async def save_settings(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     form = await request.form()
     settings = await _get_or_create_settings(session)

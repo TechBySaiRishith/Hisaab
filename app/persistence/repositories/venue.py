@@ -1,4 +1,5 @@
 """Venue repository — manages venues + rate history."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -44,11 +45,7 @@ class VenueRepository:
         return v
 
     async def get(self, venue_id: int) -> Venue | None:
-        stmt = (
-            select(Venue)
-            .where(Venue.id == venue_id)
-            .options(selectinload(Venue.rate_history))
-        )
+        stmt = select(Venue).where(Venue.id == venue_id).options(selectinload(Venue.rate_history))
         return (await self._s.execute(stmt)).scalar_one_or_none()
 
     async def list_all(self) -> Sequence[Venue]:

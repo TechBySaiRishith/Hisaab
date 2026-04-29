@@ -1,4 +1,5 @@
 """Session wizard endpoints (JSON API)."""
+
 from __future__ import annotations
 
 from typing import cast
@@ -20,7 +21,8 @@ router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_draft(
-    payload: SessionSubmit, session: AsyncSession = Depends(get_session)  # noqa: B008
+    payload: SessionSubmit,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> dict[str, int]:
     service = SessionService(session)
     courts: list[CourtInputDict] = [
@@ -56,7 +58,8 @@ async def create_draft(
 
 @router.post("/{session_id}/finalize", response_model=SessionResultOut)
 async def finalize_session(
-    session_id: int, session: AsyncSession = Depends(get_session)  # noqa: B008
+    session_id: int,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> SessionResultOut:
     service = SessionService(session)
     try:

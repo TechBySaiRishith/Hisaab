@@ -1,4 +1,5 @@
 """HTML routes for the player roster."""
+
 from __future__ import annotations
 
 import phonenumbers
@@ -14,26 +15,24 @@ router = APIRouter(tags=["web:players"])
 
 @router.get("/players", response_class=HTMLResponse)
 async def list_players_html(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ) -> HTMLResponse:
     players = await PlayerRepository(session).list_active()
     templates = request.app.state.templates
-    return templates.TemplateResponse(
-        request, "players/list.html", {"players": players}
-    )
+    return templates.TemplateResponse(request, "players/list.html", {"players": players})
 
 
 @router.get("/players/new", response_class=HTMLResponse)
 async def new_player_form(request: Request) -> HTMLResponse:
     templates = request.app.state.templates
-    return templates.TemplateResponse(
-        request, "players/form.html", {"player": None}
-    )
+    return templates.TemplateResponse(request, "players/form.html", {"player": None})
 
 
 @router.post("/players")
 async def create_player_html(
-    request: Request, session: AsyncSession = Depends(get_session)  # noqa: B008
+    request: Request,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     form = await request.form()
     name = str(form.get("name", "")).strip()
@@ -54,9 +53,7 @@ async def create_player_html(
             raise HTTPException(400, f"invalid phone: {e}") from e
         if not phonenumbers.is_valid_number(parsed):
             raise HTTPException(400, "invalid phone number")
-        e164 = phonenumbers.format_number(
-            parsed, phonenumbers.PhoneNumberFormat.E164
-        )
+        e164 = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
         await repo.add_phone(p.id, e164=e164, is_primary=True)
     return RedirectResponse("/players", status_code=303)
 
@@ -71,9 +68,7 @@ async def edit_player_form(
     if player is None:
         raise HTTPException(404, f"player {player_id} not found")
     templates = request.app.state.templates
-    return templates.TemplateResponse(
-        request, "players/form.html", {"player": player}
-    )
+    return templates.TemplateResponse(request, "players/form.html", {"player": player})
 
 
 @router.post("/players/{player_id}/edit")
@@ -101,7 +96,8 @@ async def update_player_html(
 
 @router.post("/players/{player_id}/delete")
 async def delete_player_html(
-    player_id: int, session: AsyncSession = Depends(get_session)  # noqa: B008
+    player_id: int,
+    session: AsyncSession = Depends(get_session),  # noqa: B008
 ):  # type: ignore[return]
     await PlayerRepository(session).soft_delete(player_id)
     return RedirectResponse("/players", status_code=303)
